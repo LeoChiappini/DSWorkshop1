@@ -1,0 +1,169 @@
+---
+title: "Data Science Workshop 1"
+author: "Leonardo Chiappini"
+date: "2024-02-16"
+output: html_document
+---
+
+```{r Packages, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+
+
+
+```
+
+
+
+
+
+
+## Setting up the data set
+
+```{r Dataset_Setup}
+
+  data <- read.csv("https://raw.githubusercontent.com/LeoChiappini/DSWorkshop1/main/london_bikeshare.csv")
+  
+
+```
+
+
+
+
+
+
+
+
+
+## Data Cleanup
+
+```{r Data_Cleanup, echo=FALSE}
+
+# Renaming Columns
+
+# rename(new_name = old_name)
+
+data <- data %>%
+  rename(
+    count = cnt,
+    actual_temp = t1,
+    feel_like_temp = t2,
+    humidity = hum
+    )
+
+
+# Selecting columns
+
+# From the columns above, there should be some columns that stick out to you as having possible 
+# multicollinearity issues. What could these columns be? Why?
+
+
+
+
+# Transforming date data from string to date
+
+data <- data %>% mutate(date = as.Date(timestamp, format = "%m/%d/%Y %H:%M"))
+
+
+
+# Recoding weather code
+# Weather Code Explanation:
+# 1  - Clear
+# 2  - Scattered Clouds
+# 3  - Broken Clouds
+# 4  - Cloudy
+
+# 7  - Rain/Light Rain Shower/Light Rain
+
+# 10 - Rain with Thunderstorm
+
+# 26 - Snowfall
+
+# 94 - Freezing Fog
+
+data <- data %>% mutate(weather_code_new = as.factor(recode(weather_code, 
+                                             "1" = "Clear",
+                                             "2" = "Scattered Clouds",
+                                             "3" = "Broken Clouds",
+                                             "4" = "Cloudy",
+                                             "7" = "Light Rain",
+                                             "10" = "Rain w Thunderstorm",
+                                             "26" = "Snow",
+                                             "94" = "Freezing Fog" )))
+
+
+
+# Recoding Weekend, Holiday, and Season
+
+#"is_weekend" - boolean field - 
+# 0 - Weekday
+# 1 - Weekend
+data <- data %>% mutate(is_weekend_new = as.factor(recode(is_weekend,
+                                                  "0" = "Weekday",
+                                                  "1" = "Weekend")))
+
+#"is_holiday" - boolean field:
+# 1 - holiday  
+# 0 - non holiday
+data <- data %>% mutate(is_holiday_new = as.factor(recode(is_holiday,
+                                                  "0" = "Non-Holiday",
+                                                  "1" = "Holiday")))
+
+#"season" - category field meteorological seasons:
+# 0-spring 
+# 1-summer 
+# 2-fall
+# 3-winter
+data <- data %>% mutate(season_new = as.factor(recode(season,
+                                              "0" = "Spring",
+                                              "1" = "Summer",
+                                              "2" = "Fall",
+                                              "3" = "Winter")))
+
+
+```
+
+
+
+
+
+
+
+## Data Visualization
+
+``` {r Data_Visualization, echo=FALSE}
+
+
+# Line Graph
+
+
+
+# Dot Plot
+
+
+
+
+# Histogram
+
+
+
+
+```
+
+
+
+
+
+
+
+## Linear Regression Model
+
+``` {r Linear_Regression}
+
+# model <- lm(cnt ~ (t2 + hum + weather_code + is_holiday + is_weekend), data = london_data) # REMEMBER WE RENAMED THE COLUMNS
+
+```
+
+
+
