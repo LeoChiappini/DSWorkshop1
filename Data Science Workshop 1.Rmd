@@ -58,6 +58,9 @@ data <- data %>%
 # From the columns above, there should be some columns that stick out to you as having possible 
 # multicollinearity issues. What could these columns be? Why?
 
+# Lets check!
+
+
 
 
 
@@ -134,9 +137,16 @@ data <- data %>% mutate(season_new = as.factor(recode(season,
 
 ``` {r Data_Visualization, echo=FALSE}
 
+library(ggplot2)
+
 
 # Line Graph
+line_graph <- ggplot(data, aes(x = actual_temp, y = count)) +
+  geom_point() + 
+  labs(x = "Recorded Temperature", y = "Count", title = "Recorded Temperature in London vs Bikeshare Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+print(line_graph)
 
 
 # Dot Plot
@@ -161,7 +171,11 @@ data <- data %>% mutate(season_new = as.factor(recode(season,
 
 ``` {r Linear_Regression}
 
+library(car)
+
 # model <- lm(cnt ~ (t2 + hum + weather_code + is_holiday + is_weekend), data = london_data) # REMEMBER WE RENAMED THE COLUMNS
+
+# vif_vals <- vif(lm(data = data))
 
 ```
 
