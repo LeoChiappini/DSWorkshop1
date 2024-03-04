@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 
 library(dplyr)
+library(ggplot2)
+library(lubridate)
 
 
 
@@ -66,7 +68,13 @@ data <- data %>%
 
 # Transforming date data from string to date
 
-data <- data %>% mutate(date = as.Date(timestamp, format = "%m/%d/%Y %H:%M"))
+
+
+data <- data %>%
+  mutate(timestamp_new = mdy_hm(timestamp)) %>%
+  mutate(date = as.Date(timestamp_new)) %>%
+  mutate(hour = hour(timestamp_new))
+
 
 
 
@@ -140,24 +148,48 @@ data <- data %>% mutate(season_new = as.factor(recode(season,
 library(ggplot2)
 
 
-# Line Graph
-line_graph <- ggplot(data, aes(x = actual_temp, y = count)) +
+# Dot Plot
+
+dot_plot <- ggplot(data, aes(x = actual_temp, y = count)) +
   geom_point() + 
   labs(x = "Recorded Temperature", y = "Count", title = "Recorded Temperature in London vs Bikeshare Count") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-print(line_graph)
-
-
-# Dot Plot
+print(dot_plot)
 
 
 
 
 # Histogram
 
+histogram_data <- data %>% group_by(hour) %>%
+  summarize(total_count = sum(count, na.rm = TRUE))
+
+# Both of these approaches to a histogram work
+
+# Bar Graph Approach
+histogram <- ggplot(histogram_data, aes(x = hour)) +
+  geom_bar(aes(y = total_count), stat = "identity") + 
+  labs(x = "Hour", y = "Total Count", title = "Bikeshare Usage by Hour (24-Hour Format)") +
+  coord_cartesian(ylim = c(52800, 2087165))
+
+# Histogram Approach
+histogram <- ggplot(histogram_data, aes(x = hour, y = total_count)) +
+  geom_histogram(fill = "skyblue", color = "black", binwidth = 1, stat = "identity") +
+  labs(x = "Hour", y = "Total Count", title = "Hourly Count Histogram") +
+  theme_minimal() +
+  coord_cartesian(ylim = c(52800, 2087165))
+
+print(histogram)
 
 
+# Line Graph
+
+line_graph <- ggplot(histogram_data, aes(x = hour)) +
+  geom_line(aes(y = total_count), stat = "identity") +
+  labs(x = "Hour", y = "Total Count", title = "Bikeshare Usage By Hour (24-Hour Format)")
+
+print(line_graph)
 
 ```
 
