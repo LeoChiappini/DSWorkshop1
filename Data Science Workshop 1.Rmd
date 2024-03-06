@@ -18,9 +18,6 @@ library(lubridate)
 
 
 
-
-
-
 ## Setting up the data set
 
 ```{r Dataset_Setup}
@@ -29,12 +26,6 @@ library(lubridate)
   
 
 ```
-
-
-
-
-
-
 
 
 
@@ -183,6 +174,9 @@ histogram <- ggplot(histogram_data, aes(x = hour, y = total_count)) +
 print(histogram)
 
 
+
+
+
 # Line Graph
 
 line_graph <- ggplot(histogram_data, aes(x = hour)) +
@@ -205,9 +199,59 @@ print(line_graph)
 
 library(car)
 
-# model <- lm(cnt ~ (t2 + hum + weather_code + is_holiday + is_weekend), data = london_data) # REMEMBER WE RENAMED THE COLUMNS
+model <- lm(count ~ (actual_temp + feel_like_temp + humidity + weather_code + is_holiday + is_weekend + hour + wind_speed + season), data = data) # REMEMBER WE RENAMED THE COLUMNS
 
-# vif_vals <- vif(lm(data = data))
+vif_vals <- vif(model)
+
+print(vif_vals)
+
+# From these VIF values, you can tell there is high amount of collinearity between actual_temp and feel_like_temp
+
+
+
+
+
+# Lets train another model with less multicollinearity
+
+model <- lm(count ~ (feel_like_temp + weather_code_new + is_holiday_new + is_weekend_new), data = data) # REMEMBER WE RENAMED THE COLUMNS
+
+vif_vals <- vif(model)
+
+print(vif_vals)
+
+summary(model) # Print summary statistics
+
+predicted_values <- predict(model, newdata = data)
+
+# Create a new data frame with original data and predicted values
+predicted_data <- data.frame(original_data = data$count, predicted_count = predicted_values)
+
+# Print the first few rows of the predicted data frame
+head(predicted_data)
+
+predicted_data <- predicted_data %>%
+  mutate(residuals = original_data - predicted_count)
+
+print(predicted_data)
+
+
+
+
+# Goodness of Fit Measures
+RMSE <- sqrt(mean(model$residuals^2))
+print(RMSE) # 907 is a horrendous root means squared value. Indicates model is not accurate. Means our values are on average 907 units from actual value
+
+par(mfrow=c(2, 2)) # Arrange plots in a 2x2 grid
+plot(model, which = 1) # Residuals vs Fitted -> Red line should be horizontal, just like dashed line
+plot(model, which = 2) # Normal Q-Q plot -> Points should fall along a diagonal line
+plot(model, which = 3) # Scale-location plot -> Line should be horizontal
+plot(model, which = 4) # Residuals vs Leverage
+
+# From looking at these plots, we can infer that our model is not a good fit. This is likely because by using a linear regression model, we are assuming the data is linear.
+
+# The truth is that many relationships in the real world are not only non-linear, but also very chaotic. This means that there are many factors that influence the outcome you are trying to predict, most of which you cannot capture or measure (for example, whether a person has on warm clothes or not can affect whether they decide to walk or use a bike, but there is no way to record that data in a realistic and efficient manner).
+
+# In our case, this analysis would lead us to discard this model and try to find another model that may be more representative.
 
 ```
 
