@@ -82,15 +82,19 @@ data <- data %>%
 
 # 94 - Freezing Fog
 
-data <- data %>% mutate(weather_code_new = as.factor(recode(weather_code, 
-                                             "1" = "Clear",
-                                             "2" = "Scattered Clouds",
-                                             "3" = "Broken Clouds",
-                                             "4" = "Cloudy",
-                                             "7" = "Light Rain",
-                                             "10" = "Rain w Thunderstorm",
-                                             "26" = "Snow",
-                                             "94" = "Freezing Fog" )))
+
+data <- data %>% 
+  mutate(weather_code_new = case_when(
+    weather_code == "1" ~ "Clear",
+    weather_code == "2" ~ "Scattered Clouds",
+    weather_code == "3" ~ "Broken Clouds",
+    weather_code == "4" ~ "Cloudy",
+    weather_code == "7" ~ "Light Rain",
+    weather_code == "10" ~ "Rain w Thunderstorm",
+    weather_code == "26" ~ "Snow",
+    weather_code == "94" ~ "Freezing Fog",
+    TRUE ~ as.character(weather_code)  # if none of the above conditions match, keep original value
+  ))
 
 
 
@@ -99,27 +103,36 @@ data <- data %>% mutate(weather_code_new = as.factor(recode(weather_code,
 #"is_weekend" - boolean field - 
 # 0 - Weekday
 # 1 - Weekend
-data <- data %>% mutate(is_weekend_new = as.factor(recode(is_weekend,
-                                                  "0" = "Weekday",
-                                                  "1" = "Weekend")))
+data <- data %>% 
+  mutate(is_weekend_new = case_when(
+    is_weekend == "0" ~ "Weekday",
+    is_weekend == "1" ~ "Weekend",
+    TRUE ~ as.character(is_weekend)  # if none of the above conditions match, keep original value
+  ))
 
 #"is_holiday" - boolean field:
 # 1 - holiday  
 # 0 - non holiday
-data <- data %>% mutate(is_holiday_new = as.factor(recode(is_holiday,
-                                                  "0" = "Non-Holiday",
-                                                  "1" = "Holiday")))
+data <- data %>% 
+  mutate(is_holiday_new = case_when(
+    is_holiday == "0" ~ "Non-Holiday",
+    is_holiday == "1" ~ "Holiday",
+    TRUE ~ as.character(is_holiday)  # if none of the above conditions match, keep original value
+  ))
 
 #"season" - category field meteorological seasons:
 # 0-spring 
 # 1-summer 
 # 2-fall
 # 3-winter
-data <- data %>% mutate(season_new = as.factor(recode(season,
-                                              "0" = "Spring",
-                                              "1" = "Summer",
-                                              "2" = "Fall",
-                                              "3" = "Winter")))
+data <- data %>% 
+  mutate(season_new = case_when(
+    season == "0" ~ "Spring",
+    season == "1" ~ "Summer",
+    season == "2" ~ "Fall",
+    season == "3" ~ "Winter",
+    TRUE ~ as.character(season)  # if none of the above conditions match, keep original value
+  ))
 
 
 ```
