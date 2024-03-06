@@ -1,0 +1,229 @@
+---
+title: "DS Workshop 1 Working Copy"
+author: "Leonardo Chiappini"
+date: "2024-03-06"
+output: html_document
+---
+
+```{r Packages, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(car)
+
+
+
+```
+
+
+
+
+
+
+## Setting up the data set
+
+```{r Dataset_Setup}
+
+  data <- read.csv("https://raw.githubusercontent.com/LeoChiappini/DSWorkshop1/main/london_bikeshare.csv")
+  
+
+```
+
+
+
+
+
+
+
+
+
+## Data Cleanup
+
+```{r Data_Cleanup, echo=FALSE}
+
+# Renaming Columns
+
+# rename(new_name = old_name)
+
+data <- data 
+
+
+
+# Transforming date data from string to date
+
+data <- data 
+
+
+
+
+# Recoding weather code
+# Weather Code Explanation:
+# 1  - Clear
+# 2  - Scattered Clouds
+# 3  - Broken Clouds
+# 4  - Cloudy
+
+# 7  - Rain/Light Rain Shower/Light Rain
+
+# 10 - Rain with Thunderstorm
+
+# 26 - Snowfall
+
+# 94 - Freezing Fog
+
+data <- data %>% mutate(weather_code_new = as.factor(recode(weather_code, 
+                                             "1" = "Clear",
+                                             "2" = "Scattered Clouds",
+                                             )))
+
+
+
+# Recoding Weekend, Holiday, and Season
+
+#"is_weekend" - boolean field - 
+# 0 - Weekday
+# 1 - Weekend
+data <- data %>% mutate(is_weekend_new = as.factor(recode(is_weekend,
+                                                  "0" = "Weekday",
+                                                  "1" = "Weekend")))
+
+#"is_holiday" - boolean field:
+# 1 - holiday  
+# 0 - non holiday
+data <- data %>% mutate(is_holiday_new = as.factor(recode(is_holiday,
+                                                  "0" = "Non-Holiday",
+                                                  "1" = "Holiday")))
+
+#"season" - category field meteorological seasons:
+# 0-spring 
+# 1-summer 
+# 2-fall
+# 3-winter
+data <- data %>% mutate(season_new = as.factor(recode(season,
+
+                                                      
+                                                      
+                                                      ))
+                                              
+
+
+```
+
+
+
+
+
+
+
+## Data Visualization
+
+``` {r Data_Visualization, echo=FALSE}
+
+library(ggplot2)
+
+
+# Dot Plot
+
+dot_plot <- 
+
+print(dot_plot)
+
+
+
+
+# Histogram
+
+# Reworking data to show total count
+histogram_data <- data %>% group_by(hour) %>%
+  summarize(total_count = sum(count, na.rm = TRUE))
+
+# Both of these approaches to a histogram work
+
+# Bar Graph Approach
+histogram <- 
+  
+print(bar_graph)
+
+# Histogram Approach
+histogram <- 
+
+print(histogram)
+
+
+# Line Graph
+
+line_graph <- 
+  
+print(line_graph)
+
+```
+
+
+
+
+
+
+
+## Linear Regression Model
+
+``` {r Linear_Regression}
+
+library(car)
+
+model <- lm(count ~ (actual_temp + feel_like_temp + humidity + weather_code + is_holiday + is_weekend + hour + wind_speed + season), data = data) 
+# REMEMBER WE RENAMED THE COLUMNS
+
+vif_vals <- vif(model)
+
+print(vif_vals)
+
+# From these VIF values, you can tell there is high amount of collinearity between 2 variables
+
+
+
+
+
+# Lets train another model with less multicollinearity
+
+model <- lm(count ~ (ADD NEW VARIABLES HERE), data = data) # REMEMBER WE RENAMED THE COLUMNS
+
+vif_vals <- vif(model)
+
+print(vif_vals)
+
+summary(model) # Print summary statistics
+
+predicted_values <- predict(model, newdata = data)
+
+# Create a new data frame with original data and predicted values
+predicted_data <- data.frame(original_data = data$count, predicted_count = predicted_values)
+
+# Print the first few rows of the predicted data frame
+head(predicted_data)
+
+predicted_data <- predicted_data %>%
+  mutate(residuals = original_data - predicted_count)
+
+print(predicted_data)
+
+
+
+
+# Goodness of Fit Measures
+RMSE <- sqrt(mean(model$residuals^2))
+print(RMSE) # 907 is a horrendous root means squared value. Indicates model is not accurate. Means our values are on average 907 units from actual value
+
+par(mfrow=c(2, 2)) # Arrange plots in a 2x2 grid
+plot(model, which = 1) # Residuals vs Fitted -> Red line should be horizontal, just like dashed line
+plot(model, which = 2) # Normal Q-Q plot -> Points should fall along a diagonal line
+plot(model, which = 3) # Scale-location plot -> Line should be horizontal
+plot(model, which = 4) # Residuals vs Leverage
+
+# From looking at these plots, we can infer that our model is not a good fit. This is likely because by using a linear regression model, we are assuming the data is linear.
+
+# The truth is that many relationships in the real world are not only non-linear, but also very chaotic. This means that there are many factors that influence the outcome you are trying to predict, most of which you cannot capture or measure (for example, whether a person has on warm clothes or not can affect whether they decide to walk or use a bike, but there is no way to record that data in a realistic and efficient manner).
+
+# In our case, this analysis would lead us to discard this model and try to find another model that may be more representative.
+```
