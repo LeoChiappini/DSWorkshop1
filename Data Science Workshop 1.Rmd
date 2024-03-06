@@ -51,8 +51,6 @@ data <- data %>%
 # From the columns above, there should be some columns that stick out to you as having possible 
 # multicollinearity issues. What could these columns be? Why?
 
-# Lets check!
-
 
 
 
@@ -167,7 +165,7 @@ histogram <- ggplot(histogram_data, aes(x = hour)) +
 # Histogram Approach
 histogram <- ggplot(histogram_data, aes(x = hour, y = total_count)) +
   geom_histogram(fill = "skyblue", color = "black", binwidth = 1, stat = "identity") +
-  labs(x = "Hour", y = "Total Count", title = "Hourly Count Histogram") +
+  labs(x = "Hour", y = "Total Count", title = "Bikeshare Usage over Time (24-Hr Format)") +
   theme_minimal() +
   coord_cartesian(ylim = c(52800, 2087165))
 
@@ -241,7 +239,7 @@ print(predicted_data)
 RMSE <- sqrt(mean(model$residuals^2))
 print(RMSE) # 907 is a horrendous root means squared value. Indicates model is not accurate. Means our values are on average 907 units from actual value
 
-par(mfrow=c(2, 2)) # Arrange plots in a 2x2 grid
+#par(mfrow=c(2, 2)) # Arrange plots in a 2x2 grid
 plot(model, which = 1) # Residuals vs Fitted -> Red line should be horizontal, just like dashed line
 plot(model, which = 2) # Normal Q-Q plot -> Points should fall along a diagonal line
 plot(model, which = 3) # Scale-location plot -> Line should be horizontal
